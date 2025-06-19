@@ -23,13 +23,22 @@ impl Builder {
                 Token::Condition(c) => {
                     let cond = conditional::evaluate(&c, &self.context);
                     if cond {
-                        if let Some(Token::Else(cond_true)) = tokens.next() {
-                            html.push_str(&cond_true.trim());
-                        }
+                        match tokens.next() {
+                            Some(Token::Else(e)) => html.push_str(&e.trim()),
+                            Some(Token::EndIf(e)) => html.push_str(&e.trim()),
+                            _ => {}
+                        };
                     } else {
                         tokens.next(); // shift true
-                        if let Some(Token::EndIf(cond_false)) = tokens.next() {
-                            html.push_str(&cond_false.trim());
+                        if matches!(tokens.peek(), Some(Token::Else(_))) {
+                            if let Some(Token::Else(e)) = tokens.next() {
+                                html.push_str(&e.trim());
+                            }
+                        }
+                        if matches!(tokens.peek(), Some(Token::EndIf(_))) {
+                            if let Some(Token::EndIf(e)) = tokens.next() {
+                                html.push_str(&e.trim());
+                            }
                         }
                     }
                 }

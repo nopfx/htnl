@@ -13,11 +13,11 @@ Contextable! {
     }
 }
 fn main() {
-    let templ = "Sveikas, {{ UserTest.name }}! you are {% if UserTest.age >= 18 %} a man {%else%} a boy {%endif%}. {% if UserTest.role == 1 %} You are the one who knocks {%endif%}";
+    let templ = "Sveikas, {{ UserTest.name }}! you are {% if UserTest.age >= 18 %} a man {%endif%}. And this is test";
     let user = UserTest {
         name: "lazymonad".into(),
-        age: 22,
-        role: 0,
+        age: 14,
+        role: 1,
     };
 
     let htdl = builder::Builder {

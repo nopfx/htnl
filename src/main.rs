@@ -12,7 +12,7 @@ Contextable! {
     }
 }
 fn main() {
-    let templ = "Sveikas, {{ UserTest.name }}! {% if UserTest.age >= 18 %} you can buy alco {% else %} dude you are too little {% endif %} !!!";
+    let templ = "Sveikas, {{ UserTest.name }}! {% if UserTest.age >= 18 %} You're da man {%endif%} and this is text token";
     let user = UserTest {
         name: "lazymonad".into(),
         age: 23,

@@ -33,7 +33,7 @@ pub fn tokenize(input: &str) -> Vec<Token> {
         if c == '{' {
             if let Some(&next) = chars.peek() {
                 if next == '{' {
-                    chars.next(); // seek for { peek just look 
+                    chars.next();
                     if !text_buffer.is_empty() {
                         tokens.push(Token::Text(text_buffer.clone()));
                         text_buffer.clear();
@@ -44,7 +44,7 @@ pub fn tokenize(input: &str) -> Vec<Token> {
                     }
                 }
                 if next == '%' {
-                    chars.next(); // seek for % peek just look
+                    chars.next();
                     let directive = seek_until(&mut chars, "%}");
                     if directive.trim().starts_with("if ") {
                         if !text_buffer.is_empty() {

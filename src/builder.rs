@@ -29,7 +29,7 @@ impl Builder {
                             _ => {}
                         };
                     } else {
-                        tokens.next(); // shift true
+                        tokens.next();
                         if matches!(tokens.peek(), Some(Token::Else(_))) {
                             if let Some(Token::Else(e)) = tokens.next() {
                                 html.push_str(&e.trim());

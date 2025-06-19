@@ -3,7 +3,6 @@ pub struct EndIf(String);
 pub struct Else(String);
 
 pub fn evaluate(expr: &str, context: &std::collections::HashMap<String, String>) -> bool {
-    // Substitute variables from context
     let mut evaluated = String::new();
     for part in expr.split_whitespace() {
         let val = context.get(part).map(|v| v.as_str()).unwrap_or(part);

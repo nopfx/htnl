@@ -1,7 +1,3 @@
-use crate::tokens::conditional::{Condition, Else, EndIf};
-use crate::tokens::text::Text;
-use crate::tokens::variable::Variable;
-
 #[derive(Debug)]
 pub enum Token {
     Text(String),
@@ -9,6 +5,9 @@ pub enum Token {
     Condition(String),
     EndIf(String),
     Else(String),
+    IncludeHTNL(String),
+    ForLoop { var: String, iter: String },
+    EndFor(String),
 }
 
 fn seek_until(chars: &mut std::iter::Peekable<std::str::Chars>, end: &str) -> String {
@@ -21,9 +20,8 @@ fn seek_until(chars: &mut std::iter::Peekable<std::str::Chars>, end: &str) -> St
         }
         buffer.push(chars.next().unwrap());
     }
-    buffer
+    buffer[..buffer.len() - 2].to_string()
 }
-
 pub fn tokenize(input: &str) -> Vec<Token> {
     let mut tokens: Vec<Token> = Vec::new();
     let mut chars = input.chars().peekable();
@@ -39,6 +37,7 @@ pub fn tokenize(input: &str) -> Vec<Token> {
                         text_buffer.clear();
                     }
                     let var = seek_until(&mut chars, "}}");
+
                     if !var.is_empty() {
                         tokens.push(Token::Variable(var));
                     }
@@ -46,7 +45,8 @@ pub fn tokenize(input: &str) -> Vec<Token> {
                 if next == '%' {
                     chars.next();
                     let directive = seek_until(&mut chars, "%}");
-                    if directive.trim().starts_with("if ") {
+
+                    if directive.trim().to_lowercase().starts_with("if ") {
                         if !text_buffer.is_empty() {
                             tokens.push(Token::Text(text_buffer.clone()));
                             text_buffer.clear();
@@ -54,15 +54,42 @@ pub fn tokenize(input: &str) -> Vec<Token> {
                         let condition = Token::Condition(directive[3..].to_string());
                         tokens.push(condition);
                     }
-                    if directive.trim().starts_with("else") {
+                    if directive.trim().to_lowercase().starts_with("else") {
                         let elseif = Token::Else(text_buffer.clone());
                         tokens.push(elseif);
                         text_buffer.clear();
                     }
-                    if directive.trim().starts_with("endif") {
+                    if directive.trim().to_lowercase().starts_with("endif") {
                         let endif = Token::EndIf(text_buffer.clone());
                         tokens.push(endif);
                         text_buffer.clear();
+                    }
+                    if directive.trim().to_lowercase().starts_with("for ") {
+                        if !text_buffer.is_empty() {
+                            tokens.push(Token::Text(text_buffer.clone()));
+                            text_buffer.clear();
+                        }
+                        let parts: Vec<&str> = directive[4..].trim().split_whitespace().collect();
+                        if parts.len() == 3 && parts[1] == "in" {
+                            tokens.push(Token::ForLoop {
+                                var: parts[0].to_string(),
+                                iter: parts[2].to_string(),
+                            });
+                        }
+                    }
+                    if directive.trim().to_lowercase().starts_with("endfor") {
+                        let endfor = Token::EndFor(text_buffer.clone());
+                        tokens.push(endfor);
+                        text_buffer.clear();
+                    }
+
+                    if directive.trim().to_lowercase().starts_with("include ") {
+                        if !text_buffer.is_empty() {
+                            tokens.push(Token::Text(text_buffer.clone()));
+                            text_buffer.clear();
+                        }
+                        let include_htnl = Token::IncludeHTNL(directive[8..].to_string());
+                        tokens.push(include_htnl);
                     }
                 }
             }

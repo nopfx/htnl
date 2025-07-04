@@ -42,6 +42,14 @@ impl Builder {
                         }
                     }
                 }
+                Token::IncludeHTNL(i) => {
+                    html.push_str(&format!(
+                        "{} {} {}",
+                        "Will include this contents: ",
+                        i.trim(),
+                        "Later"
+                    ));
+                }
                 _ => {}
             };
         }

@@ -1,28 +1,52 @@
-#[macro_use]
-mod macros;
+use crate::htnl::HTNLFile;
 
 mod builder;
+mod htnl;
 mod tokenization;
 mod tokens;
 
-Contextable! {
-    struct UserTest {
-        name: String,
-        age: i32,
-        role: i32,
+#[macro_use]
+mod contextable;
+
+use contextable::Contextable;
+
+context! {
+    struct Post {
+        title: String,
+        slug: String,
+        author: String
     }
 }
+
 fn main() {
-    let templ = "Sveikas, {{ UserTest.name }}! you are {% if UserTest.age >= 18 %} a man {%else%} a boy {%endif%}. {% if UserTest.role == 1 %} You are the one who knocks {%endif%}";
-    let user = UserTest {
-        name: "lazymonad".into(),
-        age: 22,
-        role: 0,
+    let template: String = String::from("./tests/index.htnl");
+    let htnlfile = HTNLFile { path: template };
+    let c = htnlfile.contents();
+
+    let post1 = Post {
+        title: "Pimr as post".into(),
+        slug: "pirmas".into(),
+        author: "as".into(),
     };
 
+    let post2 = Post {
+        title: "ontras as post".into(),
+        slug: "untras".into(),
+        author: "as".into(),
+    };
+
+    println!("{:?}", post1.flatten());
+
+    let mut posts_list = vec![];
+    posts_list.push(post1);
+    posts_list.push(post2);
+
+    let context = posts_list.flatten();
+
+    println!("{:?}", context);
     let htdl = builder::Builder {
-        context: user.flatten(),
-        content: String::from(templ),
+        context: context,
+        content: String::from(c),
     };
 
     println!("Build: {}", htdl.build());

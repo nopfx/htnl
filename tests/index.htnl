@@ -1,0 +1,18 @@
+<html>
+  <head>
+    <title>{{Meta.title}}</title>
+  </head>
+  <body>
+
+    <h1>Sveikas {{ User.name }}!</h1>
+    {% if User.role == admin %}
+      <p>Adminitratorius</p>
+    {% else %}
+      <p>Dvarneska</p>
+    {%endif%}
+
+  </body>
+</html>
+
+
+

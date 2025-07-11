@@ -1,16 +1,21 @@
 <html>
   <head>
-    <title>{{Meta.title}}</title>
+    <title>{{Data.meta.Meta.title}}</title>
   </head>
   <body>
 
-    <h1>Sveikas {{ User.name }}!</h1>
-    {% if User.role == admin %}
+    <h1>Sveikas {{ Data.user.User.name }}!</h1>
+    {% if Data.user.User.role == admin %}
       <p>Adminitratorius</p>
     {% else %}
       <p>Dvarneska</p>
     {%endif%}
 
+    <div class="ciklas">
+      {% for Data.posts %}
+        <h1>{{Post.title}}</h1>
+      {% endfor %}
+    </div>
   </body>
 </html>
 

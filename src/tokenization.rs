@@ -6,7 +6,7 @@ pub enum Token {
     EndIf(String),
     Else(String),
     IncludeHTNL(String),
-    ForLoop { var: String, iter: String },
+    ForLoop(String),
     EndFor(String),
 }
 
@@ -69,15 +69,15 @@ pub fn tokenize(input: &str) -> Vec<Token> {
                             tokens.push(Token::Text(text_buffer.clone()));
                             text_buffer.clear();
                         }
-                        let parts: Vec<&str> = directive[4..].trim().split_whitespace().collect();
-                        if parts.len() == 3 && parts[1] == "in" {
-                            tokens.push(Token::ForLoop {
-                                var: parts[0].to_string(),
-                                iter: parts[2].to_string(),
-                            });
-                        }
+                        let foras: String = directive[4..].trim().split_whitespace().collect();
+                        tokens.push(Token::ForLoop(foras));
                     }
                     if directive.trim().to_lowercase().starts_with("endfor") {
+                        if !text_buffer.is_empty() {
+                            tokens.push(Token::Text(text_buffer.clone()));
+                            text_buffer.clear();
+                        }
+
                         let endfor = Token::EndFor(text_buffer.clone());
                         tokens.push(endfor);
                         text_buffer.clear();

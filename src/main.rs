@@ -17,33 +17,51 @@ context! {
         author: String
     }
 }
-
+context! {
+    struct Meta {
+        title: String
+    }
+}
+context! {
+    struct User {
+        name: String
+    }
+}
+context! {
+    struct Data {
+        posts: Vec<Post>,
+        meta: Meta,
+        user: User
+    }
+}
 fn main() {
     let template: String = String::from("./tests/index.htnl");
     let htnlfile = HTNLFile { path: template };
     let c = htnlfile.contents();
 
-    let post1 = Post {
-        title: "Pimr as post".into(),
-        slug: "pirmas".into(),
-        author: "as".into(),
+    let data = Data {
+        posts: vec![
+            Post {
+                title: "Pirmas post".into(),
+                slug: "Pirmo-post-slugas".into(),
+                author: "Nop.f(x)".into(),
+            },
+            Post {
+                title: "Antras postas".into(),
+                slug: "Antras-post".into(),
+                author: "Nop.f(x)".into(),
+            },
+        ],
+        meta: Meta {
+            title: "Blogo taitlas".into(),
+        },
+        user: User {
+            name: "NopFx".into(),
+        },
     };
 
-    let post2 = Post {
-        title: "ontras as post".into(),
-        slug: "untras".into(),
-        author: "as".into(),
-    };
+    let context = data.flatten();
 
-    println!("{:?}", post1.flatten());
-
-    let mut posts_list = vec![];
-    posts_list.push(post1);
-    posts_list.push(post2);
-
-    let context = posts_list.flatten();
-
-    println!("{:?}", context);
     let htdl = builder::Builder {
         context: context,
         content: String::from(c),

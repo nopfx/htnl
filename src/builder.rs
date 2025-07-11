@@ -42,6 +42,33 @@ impl Builder {
                         }
                     }
                 }
+                Token::ForLoop(varname) => {
+                    let mut loop_block = Vec::new();
+                    while let Some(t) = tokens.next() {
+                        if matches!(t, Token::EndFor(_)) {
+                            break;
+                        }
+                        loop_block.push(t);
+                    }
+
+                    let items = self.loop_items(&varname);
+                    for item in items {
+                        for token in &loop_block {
+                            match token {
+                                Token::Text(txt) => html.push_str(txt),
+                                Token::Variable(var) => {
+                                    let val = item
+                                        .get(var)
+                                        .or_else(|| self.context.get(var))
+                                        .cloned()
+                                        .unwrap_or_else(String::new);
+                                    html.push_str(&val);
+                                }
+                                _ => {}
+                            }
+                        }
+                    }
+                }
                 Token::IncludeHTNL(i) => {
                     html.push_str(&format!(
                         "{} {} {}",
@@ -54,5 +81,27 @@ impl Builder {
             };
         }
         html
+    }
+    fn loop_items(&self, loop_name: &str) -> Vec<HashMap<String, String>> {
+        let mut grouped: HashMap<usize, HashMap<String, String>> = HashMap::new();
+
+        for (key, value) in &self.context {
+            if let Some(stripped) = key.strip_prefix(&format!("{loop_name}.")) {
+                if let Some(rest) = stripped.strip_prefix('[') {
+                    if let Some((idx_str, field_path)) = rest.split_once("].") {
+                        if let Ok(idx) = idx_str.parse::<usize>() {
+                            grouped
+                                .entry(idx)
+                                .or_insert_with(HashMap::new)
+                                .insert(field_path.to_string(), value.clone());
+                        }
+                    }
+                }
+            }
+        }
+
+        let mut items: Vec<(usize, HashMap<String, String>)> = grouped.into_iter().collect();
+        items.sort_by_key(|(i, _)| *i);
+        items.into_iter().map(|(_, map)| map).collect()
     }
 }

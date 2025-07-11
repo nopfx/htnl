@@ -24,7 +24,8 @@ context! {
 }
 context! {
     struct User {
-        name: String
+        name: String,
+        role: String
     }
 }
 context! {
@@ -57,6 +58,7 @@ fn main() {
         },
         user: User {
             name: "NopFx".into(),
+            role: "admin".into(),
         },
     };
 

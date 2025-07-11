@@ -1,6 +1,7 @@
 <html>
   <head>
     <title>{{Data.meta.Meta.title}}</title>
+    {% include ./tests/parts/head.htnl %}
   </head>
   <body>
 

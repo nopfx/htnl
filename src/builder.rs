@@ -1,6 +1,7 @@
 use crate::tokenization::{Token, tokenize};
 use std::collections::HashMap;
 
+use crate::htnl::HTNLFile;
 use crate::tokens::conditional;
 
 pub type Context = HashMap<String, String>;
@@ -70,12 +71,15 @@ impl Builder {
                     }
                 }
                 Token::IncludeHTNL(i) => {
-                    html.push_str(&format!(
-                        "{} {} {}",
-                        "Will include this contents: ",
-                        i.trim(),
-                        "Later"
-                    ));
+                    let template: String = String::from(i.trim());
+                    let htnlfile = HTNLFile { path: template };
+                    let c = htnlfile.contents();
+
+                    let include_data = Builder {
+                        context: self.context.clone(),
+                        content: String::from(c),
+                    };
+                    html.push_str(&include_data.build());
                 }
                 _ => {}
             };

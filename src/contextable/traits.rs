@@ -4,7 +4,6 @@ pub trait Contextable {
     fn flatten(&self) -> HashMap<String, String>;
 }
 
-// String and primitives
 impl Contextable for String {
     fn flatten(&self) -> HashMap<String, String> {
         let mut map = HashMap::new();
@@ -21,7 +20,6 @@ impl Contextable for i32 {
     }
 }
 
-// Recursive flatten for Vec<T>
 impl<T: Contextable> Contextable for Vec<T> {
     fn flatten(&self) -> HashMap<String, String> {
         let mut map = HashMap::new();

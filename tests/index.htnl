@@ -14,7 +14,9 @@
 
     <div class="ciklas">
       {% for Data.posts %}
-        <h1>{{Post.title}}</h1>
+        <h1><a href="{{Post.slug}}">{{Post.title}}</a></h1>
+        <p><small>{{Post.author}}</small></p>
+        <hr />
       {% endfor %}
     </div>
   </body>

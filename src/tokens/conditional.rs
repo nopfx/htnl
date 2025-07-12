@@ -10,7 +10,6 @@ pub fn evaluate(expr: &str, context: &std::collections::HashMap<String, String>)
         evaluated.push(' ');
     }
 
-    // logika
     let tokens: Vec<&str> = evaluated.trim().split_whitespace().collect();
     if tokens.len() == 3 {
         match tokens[1] {

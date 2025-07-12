@@ -1,5 +1,41 @@
 use crate::tokens::Token;
 
+pub fn tokenize(input: &str) -> Vec<Token> {
+    let mut tokens = Vec::new();
+    let mut chars = input.chars().peekable();
+    let mut text_buffer = String::new();
+
+    while let Some(c) = chars.next() {
+        if c == '{' {
+            if let Some(&next) = chars.peek() {
+                match next {
+                    '{' => {
+                        chars.next();
+                        flush_text_buffer(&mut tokens, &mut text_buffer);
+                        let var = seek_until(&mut chars, "}}");
+                        if !var.is_empty() {
+                            tokens.push(Token::Variable(var));
+                        }
+                    }
+                    '%' => {
+                        chars.next();
+                        let directive = seek_until(&mut chars, "%}");
+                        handle_directive(&directive, &mut tokens, &mut text_buffer);
+                    }
+                    _ => text_buffer.push(c),
+                }
+            } else {
+                text_buffer.push(c);
+            }
+        } else {
+            text_buffer.push(c);
+        }
+    }
+
+    flush_text_buffer(&mut tokens, &mut text_buffer);
+    tokens
+}
+
 fn seek_until(chars: &mut std::iter::Peekable<std::str::Chars>, end: &str) -> String {
     let mut buffer = String::new();
     while let Some(_) = chars.peek() {
@@ -43,40 +79,4 @@ fn handle_directive(directive: &str, tokens: &mut Vec<Token>, text_buffer: &mut 
         flush_text_buffer(tokens, text_buffer);
         tokens.push(Token::IncludeHTNL(trimmed[8..].trim().to_string()));
     }
-}
-
-pub fn tokenize(input: &str) -> Vec<Token> {
-    let mut tokens = Vec::new();
-    let mut chars = input.chars().peekable();
-    let mut text_buffer = String::new();
-
-    while let Some(c) = chars.next() {
-        if c == '{' {
-            if let Some(&next) = chars.peek() {
-                match next {
-                    '{' => {
-                        chars.next();
-                        flush_text_buffer(&mut tokens, &mut text_buffer);
-                        let var = seek_until(&mut chars, "}}");
-                        if !var.is_empty() {
-                            tokens.push(Token::Variable(var));
-                        }
-                    }
-                    '%' => {
-                        chars.next();
-                        let directive = seek_until(&mut chars, "%}");
-                        handle_directive(&directive, &mut tokens, &mut text_buffer);
-                    }
-                    _ => text_buffer.push(c),
-                }
-            } else {
-                text_buffer.push(c);
-            }
-        } else {
-            text_buffer.push(c);
-        }
-    }
-
-    flush_text_buffer(&mut tokens, &mut text_buffer);
-    tokens
 }

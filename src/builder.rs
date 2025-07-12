@@ -1,4 +1,5 @@
-use crate::tokenization::{Token, tokenize};
+use crate::tokenization::tokenize;
+use crate::tokens::Token;
 use std::collections::HashMap;
 
 use crate::htnl::HTNLFile;
